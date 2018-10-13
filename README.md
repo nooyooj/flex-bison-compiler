@@ -1,4 +1,4 @@
-## flex-bison-compiler
+# flex-bison-compiler
 Compiler construction using Flex and Bison
 
 ## Setup Instructions
