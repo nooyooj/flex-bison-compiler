@@ -1,7 +1,8 @@
 ## flex-bison-compiler
+Compiler construction using Flex and Bison
 
-#### Setup Instructions
+## Setup Instructions
 Clone this repository. You will need `flex`, `bison`, and `gcc` installed on your machine.
 
-For Flex:
+#### For Flex:
 `flex lexer.l`
