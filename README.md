@@ -5,7 +5,7 @@ Compiler construction using Flex and Bison
 Clone this repository. You will need `flex`, `bison`, and `gcc` installed on your machine.
 
 #### For Flex:
-`flex lexer.l`
+`$ flex lexer.l`
 
 #### For Bison:
-`bison -d compiler.y`
+`$ bison -d compiler.y`
