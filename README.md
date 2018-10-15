@@ -12,4 +12,4 @@ compiled: `lex.yy.c`
 #### For Bison:
 `$ bison -d compiler.y`
 <br />
-compiled: `compiler.tab.c`, `compiler.tab.h
+compiled: `compiler.tab.c`, `compiler.tab.h`
