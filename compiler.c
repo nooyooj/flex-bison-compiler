@@ -4,39 +4,68 @@
 #include <math.h>
 #include "compiler.h"
 
-static unsigned sym_hash(char *sym) {
+static unsigned symbol_hash(char *symbol) {
 	unsigned int hash = 0;
 
 	unsigned c;
 
-	while(c = *sym++) {
+	while(c = *symbol++) {
 		hash = hash * 9 ^ c;
 
 		return hash;
 	}
 }
 
-struct symbol * lookup(char *sym) {
-	struct symbol *sp = &sym_tab[sym_hash(sym) % NHASH];
+struct symbol * lookup(char *symbol) {
+	struct symbol *sp = &symbol_tab[symbol_hash(symbol) % NHASH];
 
-	int sym_count = NHASH;
+	int symbol_count = NHASH;
 
-	while(--sym_count >= 0) {
-		if(sp->name && !strcmp(sp->name, sym)) {
+	while(--symbol_count >= 0) {
+		if(sp->name && !strcmp(sp->name, symbol)) {
 			return sp;
 		}
 		if(!sp->name) {
-			sp->name = strdup(sym);
+			sp->name = strdup(symbol);
 			sp->value = 0;
 		}
-		if(++sp >= sym_tab + NHASH) {
-			sp = sym_tab;
+		if(++sp >= symbol_tab + NHASH) {
+			sp = symbol_tab;
 		}
 	}
 
-	yyerror("sym_tab overflow...\n");
+	yyerror("symbol_tab overflow...\n");
 
 	abort();
+}
+
+struct ast *new_ast(int node_type, struct ast *left, struct ast *right) {
+	struct ast *a = malloc(sizeof(struct ast));
+
+	if(!a) {
+		yyerror("out of space");
+
+		exit(0);
+	}
+		
+	a->node_type = node_type;
+	a->left = left;
+	a->right = right;
+}
+
+struct ast *new_num(double d) {
+	struct num_val *a = malloc(sizeof(struct num_val));
+
+	if(!a) {
+		yyerror("out of space");
+
+		exit(0);
+	}
+
+	a->node_type = 'K';
+	a->number = d;
+
+	return (struct ast *)a;
 }
 
 void yy_error(char *s) {

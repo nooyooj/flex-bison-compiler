@@ -1,5 +1,6 @@
 void yy_error(char *s);
 int yy_parse();
+int yylex();
 
 struct symbol {
 	char *name;
@@ -13,20 +14,22 @@ struct symbol {
 };
 
 #define NHASH 9997
-struct symbol sym_tab[NHASH];
+struct symbol symbol_tab[NHASH];
 struct symbol *lookup(char*);
 
-struct sym_list {
-	struct symbol *sym;
-	struct sym_list *next;
+struct symbol_list {
+	struct symbol *symbol;
+	struct symbol_list *next;
 };
 
 struct num_list {
+	double n;
+
 	struct num_list *next;
 }
 
-struct sym_list *new_sym_list(struct symbol *sym, struct symlist *next);
-struct num_list *new_num_list(double n, struct num_list *nl);
+struct symbol_list *new_symbol_list(struct symbol *symbol, struct symbol_list *next);
+struct num_list *new_num_list(double n, struct num_list *num_list);
 
 struct ast {
 	struct ast *left;
@@ -39,4 +42,23 @@ struct printcall {
 	struct ast *left;
 
 	int node_type;
-}
+};
+
+struct flow {
+	struct ast *cond;
+	struct ast *t_left;
+	struct ast *e_left;
+
+	int node_type;
+};
+
+struct num_val {
+	int node_type;
+
+	double number;
+};
+
+struct symbol_ref {
+	int node_type;
+	struct symbol *symbol;
+};
