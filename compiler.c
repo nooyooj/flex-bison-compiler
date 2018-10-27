@@ -290,3 +290,15 @@ struct ast *newInitialArr(struct symbol *symbol, struct numList *numList)
     return (struct ast *)sia;
 }
 
+void yyerror(char *s)
+{
+	fprintf(stderr, "error: %s\n", s);
+}
+
+int main(int argc, char**argv)
+{
+	extern FILE *yyin;
+	++argv; --argc;
+	yyin = fopen(argv[0], "r");
+	return yyparse();
+}

@@ -135,7 +135,6 @@ struct ast *newRef(struct symbol *symbol);
 struct ast *newAssign(struct symbol *symbol, struct ast *v);
 struct ast *newNum(double number);
 
-
 struct ast *newDeclaration(struct symbolList *symbolList, char type);
 struct ast *newDeclarationArr(struct symbolList *symbolList, int begin, int end, char type);
 struct ast *newAssignArr(struct symbol *symbol, struct ast *index, struct ast *a);
