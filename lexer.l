@@ -1,7 +1,7 @@
 %option noyywrap
 %{
-	#include "compiler.h"
-	#include "compiler.tab.h"
+#include "compiler.h"
+#include "grammar.tab.h"
 %}
 
 %%
@@ -35,19 +35,21 @@
 "real"		{ yylval.type_c = 'b'; return STD_TYPE; }
 
 "program"	{ return PROGRAM; }
-"var"		{ return VAR; }
-"array"		{ return ARRAY; }
-"of"		{ return OF; }
-"begin"		{ return BGN; }
-"end"		{ return END; }
-"if"		{ return IF; }
-"then"		{ return THEN; }
-"else"		{ return ELSE; }
-"while"		{ return WHILE; }
-"do"		{ return DO; }
-"print"		{ return PRINT; }
+"var"	{ return VAR; }
+"array"	{ return ARRAY; }
+"of"	{ return OF; }
+"begin"	{ return BGN; }
+"end"	{ return END; }
 
-[a-zA-Z][a-zA-Z0-9]*	{ yylval.s = lookup(yytext); return ID; }
+"if"	{ return IF; }
+"then"	{ return THEN; }
+"else"	{ return ELSE; }
+"while"	{ return WHILE; }
+"do"	{ return DO; }
+
+"print"	{ return PRINT; }
+
+[a-zA-Z][a-zA-Z0-9]*	{ yylval.s = lookUp(yytext); return ID; }
 
 [0-9]+"."[0-9]+	|
 [0-9]+	{ yylval.d = atof(yytext); return NUMBER; }

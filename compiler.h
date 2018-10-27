@@ -1,64 +1,145 @@
-void yy_error(char *s);
-int yy_parse();
+void yyerror(char *s);
+
+int yyparse();
 int yylex();
 
-struct symbol {
+struct symbol 
+{
+	double *arr_head;
+	double value;
+
 	char *name;
 	char type;
 
 	int arr_len;
-	int initial_index;
-
-	double value;
-	double *arr_head;
+	int ini_index;
 };
 
 #define NHASH 9997
-struct symbol symbol_tab[NHASH];
-struct symbol *lookup(char*);
+struct symbol symbolTable[NHASH];
 
-struct symbol_list {
+struct symbol *lookUp(char *);
+
+struct symbolList 
+{
 	struct symbol *symbol;
-	struct symbol_list *next;
+	struct symbolList *next;
 };
 
-struct num_list {
-	double n;
+struct numList 
+{
+	double number;
 
-	struct num_list *next;
-}
+	struct numList *next;
+};
 
-struct symbol_list *new_symbol_list(struct symbol *symbol, struct symbol_list *next);
-struct num_list *new_num_list(double n, struct num_list *num_list);
+struct symbolList *newSymbolList(struct symbol *symbol, struct symbolList *next);
+struct numList *newNumList(double number, struct numList *numList);
 
-struct ast {
+struct ast 
+{
+	int nodeType;
+
 	struct ast *left;
 	struct ast *right;
-
-	int node_type;
 };
 
-struct printcall {
+struct printCall 
+{
+	int nodeType;
+
 	struct ast *left;
-
-	int node_type;
 };
 
-struct flow {
+struct flow 
+{
+	int nodeType;
+
 	struct ast *cond;
-	struct ast *t_left;
-	struct ast *e_left;
-
-	int node_type;
+	struct ast *tl;
+	struct ast *el;
 };
 
-struct num_val {
-	int node_type;
+struct numVal 
+{
+	int nodeType;
 
 	double number;
 };
 
-struct symbol_ref {
-	int node_type;
+struct symbolRef 
+{
+	int nodeType;
+
 	struct symbol *symbol;
 };
+
+struct symbolRefArr 
+{
+	int nodeType;
+
+	struct symbol *symbol;
+
+	struct ast *index;
+};
+
+struct symbolAssign 
+{
+	int nodeType;
+
+	struct symbol *symbol;
+
+	struct ast *v;
+};
+
+struct symbolAssignArr 
+{
+	int nodeType;
+	
+	struct symbol *symbol;
+
+	struct ast *index;
+	struct ast *v;
+};
+
+struct symbolInitialArr 
+{
+	int nodeType;
+
+	struct symbol *symbol;
+	struct numList *numList;
+};
+
+struct declaration 
+{
+	int nodeType;
+
+	struct symbolList *symbolList;
+
+	char type;
+};
+
+struct declarationArr
+{
+	int nodeType;
+	struct symbolList *symbolList;
+	int length;
+	int shift;
+	char type;
+};
+
+struct ast *newAst(int nodeType, struct ast *left, struct ast *right);
+struct ast *newCmp(int cmpType, struct ast *left, struct ast *right);
+struct ast *newPrint(struct ast *left);
+struct ast *newRef(struct symbol *symbol);
+struct ast *newAssign(struct symbol *symbol, struct ast *v);
+struct ast *newNum(double number);
+
+
+struct ast *newDeclaration(struct symbolList *symbolList, char type);
+struct ast *newDeclarationArr(struct symbolList *symbolList, int begin, int end, char type);
+struct ast *newAssignArr(struct symbol *symbol, struct ast *index, struct ast *a);
+struct ast *newRefArr(struct symbol *symbol, struct ast *index);
+struct ast *newInitialArr(struct symbol *symbol, struct numList *numList);
+
+

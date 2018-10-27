@@ -4,81 +4,289 @@
 #include <math.h>
 #include "compiler.h"
 
-static unsigned symbol_hash(char *symbol) {
+static unsigned symbolHash(char *symbol)
+{
 	unsigned int hash = 0;
 
-	unsigned c;
+	unsigned ch;
 
-	while(c = *symbol++) {
-		hash = hash * 9 ^ c;
+	while(ch = *symbol++)
+	{
+		hash = hash * 9 ^ ch;
 
 		return hash;
 	}
 }
 
-struct symbol * lookup(char *symbol) {
-	struct symbol *sp = &symbol_tab[symbol_hash(symbol) % NHASH];
+struct symbol *lookUp(char *symbol)
+{
+	struct symbol *s = &symbolTable[symbolHash(symbol) % NHASH];
 
-	int symbol_count = NHASH;
+	int symbolCount = NHASH;
 
-	while(--symbol_count >= 0) {
-		if(sp->name && !strcmp(sp->name, symbol)) {
-			return sp;
+	while(--symbolCount >= 0)
+	{
+		if(s->name && !strcmp(s->name, symbol))
+		{
+			return s;
 		}
-		if(!sp->name) {
-			sp->name = strdup(symbol);
-			sp->value = 0;
+
+		if(!s->name)
+		{
+			s->name = strdup(symbol);
+			s->value = 0;
+
+			return s;
 		}
-		if(++sp >= symbol_tab + NHASH) {
-			sp = symbol_tab;
+
+		if(++s >= symbolTable + NHASH)
+		{
+			s = symbolTable;
 		}
 	}
 
-	yyerror("symbol_tab overflow...\n");
+	yyerror("symbol table overflow occurred\n");
 
 	abort();
 }
 
-struct ast *new_ast(int node_type, struct ast *left, struct ast *right) {
+struct ast *newAst(int nodeType, struct ast *left, struct ast *right)
+{
 	struct ast *a = malloc(sizeof(struct ast));
 
-	if(!a) {
+	if(!a)
+	{
 		yyerror("out of space");
 
 		exit(0);
 	}
-		
-	a->node_type = node_type;
+
+	a->nodeType = nodeType;
 	a->left = left;
 	a->right = right;
+
+	return a;
 }
 
-struct ast *new_num(double d) {
-	struct num_val *a = malloc(sizeof(struct num_val));
+struct ast *newNum(double number)
+{
+	struct numVal *n = malloc(sizeof(struct numVal));
 
-	if(!a) {
+	if(!n)
+	{
 		yyerror("out of space");
 
 		exit(0);
 	}
 
-	a->node_type = 'K';
-	a->number = d;
+	n->nodeType = 'K';
+	n->number = number;
 
-	return (struct ast *)a;
+	return (struct ast *)n;
 }
 
-void yy_error(char *s) {
-	fprintf(stderr, "error: %s\n", s);
+struct ast *newCmp(int cmpType, struct ast *left, struct ast *right)
+{
+	struct ast *a = malloc(sizeof(struct ast));
+
+	if(!a)
+	{
+		yyerror("out of space");
+
+		exit(0);
+	}
+
+	a->nodeType = '0' + cmpType;
+	a->left = left;
+	a->right = right;
+
+	return a;
 }
 
-int main(int argc, char** argv) {
-	extern FILE *yy_in;
-	
-	++argv;
-	--argc;
-	
-	yyin = fopen(argv[0], "r");
+struct ast *newPrint(struct ast *left)
+{
+	struct printCall *p = malloc(sizeof(struct printCall));
 
-	return yy_parse();
+	if(!p)
+	{
+		yyerror("out of space");
+
+		exit(0);
+	}
+
+	p->nodeType = 'P';
+	p->left = left;
+
+	return (struct ast *)p;
 }
+
+struct ast *newRef(struct symbol *symbol)
+{
+	struct symbolRef *sr = malloc(sizeof(struct symbolRef));
+
+	if(!sr)
+	{
+		yyerror("out of space");
+
+		exit(0);
+	}
+
+	sr->nodeType = 'N';
+	sr->symbol = symbol;
+
+	return (struct ast *)sr;
+}
+
+struct ast *newRefArr(struct symbol *symbol, struct ast *index)
+{
+	struct symbolRefArr *sra = malloc(sizeof(struct symbolRefArr));
+
+	if(!sra)
+	{
+		yyerror("out of space");
+
+		exit(0);
+	}
+
+	sra->nodeType = 'U';
+	sra->symbol = symbol;
+	sra->index = index;
+
+	return (struct ast *)sra;
+}
+
+struct ast *newAssign(struct symbol *symbol, struct ast *v)
+{
+	struct symbolAssign *sa = malloc(sizeof(struct symbolAssign));
+
+	if(!sa)
+	{
+		yyerror("out of space");
+
+		exit(0);
+	}
+
+	sa->nodeType = '=';
+	sa->symbol = symbol;
+	sa->v = v;
+
+	return (struct ast *)sa;
+}
+
+struct ast *newAssignArr(struct symbol *symbol, struct ast *index, struct ast *v)
+{
+	struct symbolAssignArr *saa = malloc(sizeof(struct symbolAssignArr));
+
+	if(!saa)
+	{
+		yyerror("out of space");
+		
+		exit(0);
+	}
+
+	saa->nodeType = 'V';
+	saa->symbol = symbol;
+	saa->index = index;
+	saa->v = v;
+
+	return (struct ast *)saa;
+}
+
+struct ast *newDeclaration(struct symbolList *symbolList, char type)
+{
+	struct declaration *d = malloc(sizeof(struct declaration));
+
+	if(!d)
+	{
+		yyerror("out of space");
+		
+		exit(0);
+	}
+
+	d->nodeType ='X';
+	d->symbolList = symbolList;
+	d->type = type;
+
+	return (struct ast *)d;
+}
+
+struct ast *newDeclarationArr(struct symbolList *symbolList, int begin, int end, char type)
+{
+	struct declarationArr *da = malloc(sizeof(struct declarationArr));
+
+	if(!da)
+	{
+		yyerror("out of space");
+		
+		exit(0);
+	}
+
+	da->nodeType = 'Y';
+	da->symbolList = symbolList;
+	da->length = end - begin + 2;
+
+	if(da->length < 1)
+	{
+		yyerror("too small size for array");
+		
+		exit(0);
+	}
+
+	da->shift = begin;
+	da->type = type;
+
+	return (struct ast *)da;
+}
+
+struct symbolList *newSymbolList(struct symbol *symbol, struct symbolList *next)
+{
+	struct symbolList *sl = malloc(sizeof(struct symbolList));
+
+    	if(!sl)
+    	{
+        	yyerror("out of space");
+
+        	exit(0);
+ 	   }
+ 
+    	sl->symbol = symbol;
+    	sl->next = next;
+     
+	return sl;
+}
+
+struct numList *newNumList(double number, struct numList *next)
+{
+    struct numList *nl = malloc(sizeof(struct numList));
+    
+    if(!nl)
+    {
+        yyerror("out of space");
+        
+        exit(0);
+    }   
+    
+    nl->number = number;
+    nl->next = next;
+
+    return nl;
+}
+
+struct ast *newInitialArr(struct symbol *symbol, struct numList *numList)
+{
+    struct symbolInitialArr *sia = malloc(sizeof(struct symbolInitialArr));
+    
+    if(!sia)
+    {
+        yyerror("out of space");
+
+        exit(0);
+    }   
+     
+    sia->nodeType = 'T';
+    sia->symbol = symbol;
+    sia->numList = numList;
+     
+    return (struct ast *)sia;
+}
+
