@@ -5,14 +5,14 @@ int yylex();
 
 struct symbol 
 {
-	double *arr_head;
+	double *arrHead;
 	double value;
 
 	char *name;
 	char type;
 
-	int arr_len;
-	int ini_index;
+	int arrLength;
+	int initialIndex;
 };
 
 #define NHASH 9997
@@ -56,8 +56,8 @@ struct flow
 	int nodeType;
 
 	struct ast *cond;
-	struct ast *tl;
-	struct ast *el;
+	struct ast *treeList;
+	struct ast *evalList;
 };
 
 struct numVal 
@@ -67,14 +67,14 @@ struct numVal
 	double number;
 };
 
-struct symbolRef 
+struct symbolReference
 {
 	int nodeType;
 
 	struct symbol *symbol;
 };
 
-struct symbolRefArr 
+struct symbolReferenceArr 
 {
 	int nodeType;
 
@@ -129,16 +129,20 @@ struct declarationArr
 };
 
 struct ast *newAst(int nodeType, struct ast *left, struct ast *right);
-struct ast *newCmp(int cmpType, struct ast *left, struct ast *right);
+struct ast *newCompare(int compareType, struct ast *left, struct ast *right);
 struct ast *newPrint(struct ast *left);
-struct ast *newRef(struct symbol *symbol);
+struct ast *newReference(struct symbol *symbol);
 struct ast *newAssign(struct symbol *symbol, struct ast *v);
 struct ast *newNum(double number);
+struct ast *newFlow(int nodeType, struct ast *cond, struct ast *tl, struct ast *tr);
 
 struct ast *newDeclaration(struct symbolList *symbolList, char type);
 struct ast *newDeclarationArr(struct symbolList *symbolList, int begin, int end, char type);
 struct ast *newAssignArr(struct symbol *symbol, struct ast *index, struct ast *a);
-struct ast *newRefArr(struct symbol *symbol, struct ast *index);
+struct ast *newReferenceArr(struct symbol *symbol, struct ast *index);
 struct ast *newInitialArr(struct symbol *symbol, struct numList *numList);
 
+double eval(struct ast *);
+
+void treeFree(struct ast *);
 

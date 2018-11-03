@@ -31,8 +31,8 @@
 ">="	{ yylval.fn = 5; return CMP; }
 "<="	{ yylval.fn = 6; return CMP; }
 
-"integer"	{ yylval.type_c = 'a'; return STD_TYPE; }
-"real"		{ yylval.type_c = 'b'; return STD_TYPE; }
+"integer"	{ yylval.typeC = 'a'; return STD_TYPE; }
+"real"		{ yylval.typeC = 'b'; return STD_TYPE; }
 
 "program"	{ return PROGRAM; }
 "var"	{ return VAR; }
@@ -49,7 +49,7 @@
 
 "print"	{ return PRINT; }
 
-[a-zA-Z][a-zA-Z0-9]*	{ yylval.s = lookUp(yytext); return ID; }
+[a-zA-Z][a-zA-Z0-9]*	{ yylval.symbol = lookUp(yytext); return SYMBOL; }
 
 [0-9]+"."[0-9]+	|
 [0-9]+	{ yylval.d = atof(yytext); return NUMBER; }
