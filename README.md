@@ -13,7 +13,7 @@ Clone this repository. You will need `flex`, `bison`, and `gcc` installed on you
 *compiled*: `compiler`, `grammar.tab.c`, `grammar.tab.h`, `lexer.yy.c`
 
 #### To run:
-`$ ./compiler [FILE_NAME]`
+`$ ./compiler FILE_NAME.txt`
 
 #### To clear:
 `$ ./clear.sh`
